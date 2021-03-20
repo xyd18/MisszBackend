@@ -12,13 +12,23 @@ URL_GPT = "http://lab.aminer.cn/isoa-2021/gpt"
 
 
 def deduplication(txt):
-    pattern = r'[, ; \' ` \[ \] \? : " \{ \} \~ ! \( \) \_  ， 。 、 ； ‘ ’ 【 】 · ！？ … （ ） 《 》]'
+    pattern = r'([, ; \' ` \[ \] \? : " \{ \} \~ ! \( \) \_  ， 。 、 ； ‘ ’ 【 】 · ！？ … （ ） 《 》])'
+    punctuation = [",", ";", "\'", "`", "[", "]", "\?", ":", "\"", "{", "}", "~", "!", "(", ")", "_", "，", "。", "、",
+                   "；", "‘", "’", "【", "】", "·", "！", "？", "…", "（", "）", "《", "》"]
     lines = re.split(pattern, txt)
+    print(lines)
     list_1 = []
+    print()
+    for i, value in enumerate(lines):
+        if value in punctuation:
+            lines[i - 1] += value
+            lines.remove(value)
     for line in lines:
         if line not in list_1 and len(line) != 0:
             list_1.append(line)
-    return_string = "，".join(list_1)+"。"
+    return_string = ""
+    for str in list_1:
+        return_string += str
     return return_string
 
 

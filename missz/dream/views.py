@@ -1,5 +1,3 @@
-from django.shortcuts import render
-
 # Create your views here.
 from django.http import HttpResponse
 import urllib.request
@@ -36,9 +34,9 @@ def interpret_dream(request):
         return_json = 'POST only!'
         return HttpResponse(return_json)
     # content = "身份：军人。年龄：25岁。性别：女。梦境：" + dream + "周公解梦：这个梦的含义是，"
-    content = "梦境：" + dream + "周公解梦：这个梦的含义是，"
+    content = dream + "周公解梦：这个梦的含义是，"
     body = {
-        "token": TOKEN_PUB,
+        "token": TOKEN,
         "app": "chat",
         "content": content
     }

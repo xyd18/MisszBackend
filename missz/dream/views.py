@@ -5,11 +5,24 @@ from django.http import HttpResponse
 import urllib.request
 import json
 import logging
+import re
 
 TOKEN = "c486e142f0ed6050f8d0497968079eb2"
 TOKEN_PUB = "da5d90ab00b50c2ba032d944d75f95db"
 URL_USER = "http://lab.aminer.cn/isoa-2021/user"
 URL_GPT = "http://lab.aminer.cn/isoa-2021/gpt"
+
+
+def deduplication(txt):
+    pattern = r'[, ; \' ` \[ \] \? : " \{ \} \~ ! \( \) \_  ， 。 、 ； ‘ ’ 【 】 · ！？ … （ ） 《 》]'
+    lines = re.split(pattern, txt)
+    list_1 = []
+    for line in lines:
+        if line not in list_1 and len(line) != 0:
+            list_1.append(line)
+    return_string = "，".join(list_1)+"。"
+    return return_string
+
 
 def interpret_dream(request):
     if request.method == 'POST':
@@ -41,6 +54,7 @@ def interpret_dream(request):
     res = json.loads(resp)
     interpret = res.get("result")[len(content):]
     return HttpResponse(interpret)
+
 
 def check_times(request):
     body = {

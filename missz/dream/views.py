@@ -26,8 +26,9 @@ def deduplication(txt):
 
 
 def interpret_dream(request):
+    print("request.method:\n",request.method)
     if request.method == 'POST':
-        try :
+        try:
             req = json.loads(request.body)
         # name = req.get('name')
             dream = req.get('dream')

@@ -12,7 +12,7 @@ URL_GPT = "http://lab.aminer.cn/isoa-2021/gpt"
 
 
 def deduplication(txt):
-    lines = re.split(r"([.。!！?？；;，,\s+])", txt)
+    lines = re.split(r"([.。!！?？；;：:，,\s+])", txt)
     lines.append("")
     lines = ["".join(i) for i in zip(lines[0::2], lines[1::2])]
     list_1 = []
@@ -53,7 +53,8 @@ def interpret_dream(request):
         logging.error(e)
         print(e)
     res = json.loads(resp)
-    interpret = res.get("result")[len(content):]
+    deduplication_txt = deduplication(res.get("result"))
+    interpret = deduplication_txt[len(content):]
     return HttpResponse(interpret)
 
 

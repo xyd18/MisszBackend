@@ -28,20 +28,20 @@ jobs:
           python -m pip install --upgrade pip
           pip install -r requirements.txt
 
-  # deploy:
-  #   runs-on: ubuntu-latest
+  deploy:
+    runs-on: ubuntu-latest
 
-  #   steps:
-  #     - name: Checkout main
-  #       uses: actions/checkout@main
+    steps:
+      - name: Checkout main
+        uses: actions/checkout@main
 
-  #     - name: Deploy Alibaba Cloud
-  #       uses: hengkx/ssh-deploy@v1.0.1
-  #       with:
-  #         HOST: ${{ secrets.DEPLOY_HOST }}
-  #         USERNAME: "xdl"
-  #         PASSWORD: ${{ secrets.DEPLOY_PASSWD }}
-  #         SOURCE: "."
-  #         TARGET: "/home/xdl/back"
-  #         AFTER_COMMAND: "./run.sh"
+      - name: Deploy Alibaba Cloud
+        uses: hengkx/ssh-deploy@v1.0.1
+        with:
+          HOST: ${{ secrets.DEPLOY_HOST }}
+          USERNAME: "xdl"
+          PASSWORD: ${{ secrets.DEPLOY_PASSWD }}
+          SOURCE: "."
+          TARGET: "/home/xdl/back"
+          AFTER_COMMAND: ""
 

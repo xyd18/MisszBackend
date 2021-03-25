@@ -51,16 +51,22 @@ def interpret_dream(request):
     data = bytes(json.dumps(body), 'utf8')
     headers = {"Content-Type": 'application/json'}
     req = urllib.request.Request(url=URL_GPT, headers=headers, data=data)
+
     try:
         resp = urllib.request.urlopen(req).read()
         print(resp.decode('utf-8'))
     except Exception as e:
         logging.error(e)
         print(e)
-    res = json.loads(resp)
-    deduplication_txt = deduplication(res.get("result"))
-    interpret = deduplication_txt[len(content):]
-    return HttpResponse(interpret)
+    print(resp.decode('utf-8'))
+    try:
+        res = json.loads(resp)
+        deduplication_txt = deduplication(res.get("result"))
+        interpret = deduplication_txt[len(content):]
+        return HttpResponse(interpret)
+    except Exception as e:
+        logging.error(e)
+        return HttpResponse("error happened!")
 
 
 def check_times(request):

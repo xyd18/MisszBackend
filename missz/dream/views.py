@@ -27,14 +27,18 @@ def deduplication(txt):
 
 def interpret_dream(request):
     if request.method == 'POST':
-        req = json.loads(request.body)
+        try :
+            req = json.loads(request.body)
         # name = req.get('name')
-        dream = req.get('dream')
-        print(dream)
+            dream = req.get('dream')
+            print(dream)
         # return_json = json.dumps((name, job))
         # return HttpResponse(return_json)
+        except Exception as e:
+            print(e)
     else:
         return_json = 'POST only!'
+        print(return_json)
         return HttpResponse(return_json)
     # content = "身份：军人。年龄：25岁。性别：女。梦境：" + dream + "周公解梦：这个梦的含义是，"
     content = dream + "周公解梦：这个梦的含义是，"

@@ -34,13 +34,12 @@ def deduplication(txt):
 
 
 def interpret_dream(request):
-    print("request.method:\n",request.method)
     if request.method == 'POST':
         try:
             req = json.loads(request.body)
         # name = req.get('name')
             dream = req.get('dream')
-            print(dream)
+            print("收到梦境 "+dream)
         # return_json = json.dumps((name, job))
         # return HttpResponse(return_json)
         except Exception as e:
@@ -50,27 +49,30 @@ def interpret_dream(request):
         print(return_json)
         return HttpResponse(return_json)
     # content = "身份：军人。年龄：25岁。性别：女。梦境：" + dream + "周公解梦：这个梦的含义是，"
-    content = dream + "周公解梦：这个梦的含义是，"
+    content = dream + " 周公解梦：这个梦的含义是，"
     body = {
         "token": TOKEN,
         "app": "chat",
         "content": content
     }
+    print("content:" + content)
+    print("content len: "+len(content))
     data = bytes(json.dumps(body), 'utf8')
     headers = {"Content-Type": 'application/json'}
     req = urllib.request.Request(url=URL_GPT, headers=headers, data=data)
 
     try:
         resp = urllib.request.urlopen(req).read()
+        print("收到解梦\n")
         print(resp.decode('utf-8'))
     except Exception as e:
         logging.error(e)
         print(e)
-    print(resp.decode('utf-8'))
     try:
         res = json.loads(resp)
         deduplication_txt = deduplication(res.get("result"))
-        interpret = deduplication_txt[len(content):]
+        # interpret = deduplication_txt[len(content):]
+        interpret = deduplication_txt
         return HttpResponse(interpret)
     except Exception as e:
         logging.error(e)

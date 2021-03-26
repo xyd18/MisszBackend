@@ -13,12 +13,20 @@ URL_GPT = "http://lab.aminer.cn/isoa-2021/gpt"
 
 def deduplication(txt):
     lines = re.split(r"([.。!！?？；;：:，,\s+])", txt)
+    # for line in lines:
+    #     print(line+"\n")
+    # print("\n\n")
     lines.append("")
     lines = ["".join(i) for i in zip(lines[0::2], lines[1::2])]
+    # for line in lines:
+    #     print(line+"\n")
     list_1 = []
     for line in lines:
-        if line not in list_1 and len(line) != 0:
-            list_1.append(line)
+        if len(line) <= 1:
+            continue
+        if line[0:-1] not in list_1:
+            list_1.append(line[0:-1])
+            list_1.append(line[-1])
     return_string = ""
     for str in list_1:
         return_string += str

@@ -71,8 +71,7 @@ def interpret_dream(request):
     try:
         res = json.loads(resp)
         deduplication_txt = deduplication(res.get("result"))
-        # interpret = deduplication_txt[len(content):]
-        interpret = deduplication_txt
+        interpret = deduplication_txt[deduplication_txt.find("这个梦的含义是")+8:]
         return HttpResponse(interpret)
     except Exception as e:
         logging.error(e)

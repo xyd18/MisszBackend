@@ -56,7 +56,7 @@ def interpret_dream(request):
         "content": content
     }
     print("content:" + content)
-    print("content len: "+len(content))
+    # print("content len: "+len(content))
     data = bytes(json.dumps(body), 'utf8')
     headers = {"Content-Type": 'application/json'}
     req = urllib.request.Request(url=URL_GPT, headers=headers, data=data)

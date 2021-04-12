@@ -11,6 +11,8 @@ https://docs.djangoproject.com/en/3.1/ref/settings/
 """
 
 from pathlib import Path
+# import djcelery
+# from celery import platforms
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
@@ -38,7 +40,19 @@ INSTALLED_APPS = [
     'django.contrib.messages',
     'django.contrib.staticfiles',
     'dream',
+    # 'djcelery'
 ]
+
+# Celery
+# djcelery.setup_loader()
+# BROKER_URL = 'redis://127.0.0.1:6379'  # 使用redis作为任务队列
+# CELERY_RESULT_BACKEND = 'redis://127.0.0.1:6379/1'  # 使用redis存储任务执行结果
+
+# CELERY_TIMEZONE = 'Asia/Shanghai'  # 修改时区，和TIME_ZONE统一起来
+# CELERYD_FORCE_EXECV = True  # 有些情况下可以防止死锁
+# CELERYD_MAX_TASKS_PER_CHILD = 100  # 每个worker最多执行100个任务就会被销毁，可防止内存泄露
+# CELERYBEAT_SCHEDULER = 'djcelery.schedulers.DatabaseScheduler'
+# platforms.C_FORCE_ROOT = True  # 解决Linux系统下不能使用root用户启动celery
 
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',

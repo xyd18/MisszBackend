@@ -1,6 +1,10 @@
 # Create your views here.
 from django.http import HttpResponse
 from . import models
+from . import tasks
+# import asyncio
+import _thread
+
 import urllib.request
 import json
 import logging
@@ -76,7 +80,7 @@ def interpret_dream(request):
         return HttpResponse(get_db(dream))
 
     # content = "身份：军人。年龄：25岁。性别：女。梦境：" + dream + "周公解梦：这个梦的含义是，"
-    content = dream + " 周公解梦：这个梦的含义是，"
+    content = dream + " 周公解梦：这个梦的含义是,"
     body = {
         "token": TOKEN,
         "app": "chat",
@@ -84,10 +88,21 @@ def interpret_dream(request):
     }
     print("content:" + content)
     # print("content len: "+len(content))
-    print("content len: " + str(len(content)))
+    # print("content len: " + str(len(content)))
     data = bytes(json.dumps(body), 'utf8')
     headers = {"Content-Type": 'application/json'}
     req = urllib.request.Request(url=URL_GPT, headers=headers, data=data)
+
+    # 同时多次请求
+    # loop = asyncio.new_event_loop()
+    # asyncio.create_task(tasks.ask_for_interpret_competely(dream,body))
+    # loop.create_task(asking)
+    # loop.close()
+    # asyncio.run(tasks.ask_for_interpret_competely(dream,body))
+    try:
+        _thread.start_new_thread(tasks.ask_for_interpret_competely, (dream,body, ))
+    except Exception as e:
+        print("Error: unable to start thread", e)
 
     try:
         resp = urllib.request.urlopen(req).read()
@@ -105,6 +120,7 @@ def interpret_dream(request):
         return HttpResponse(interpret)
     except Exception as e:
         logging.error(e)
+        print("error happened!")
         return HttpResponse("error happened!")
 
 

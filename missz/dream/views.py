@@ -51,7 +51,7 @@ def get_all_db():
         meta_dict = {"dream": dream, "interpret": interpret}
         info.append(meta_dict)
     json_data = {"data": info}
-    return JsonResponse(json_data, status=400)
+    return JsonResponse(json_data, status=200)
 
 def all_dream(request):
     return get_all_db()

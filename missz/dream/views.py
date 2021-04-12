@@ -1,5 +1,7 @@
 # Create your views here.
 from django.http import HttpResponse
+from django.http import JsonResponse
+
 from . import models
 from . import tasks
 # import asyncio
@@ -49,8 +51,10 @@ def get_all_db():
         meta_dict = {"dream": dream, "interpret": interpret}
         info.append(meta_dict)
     json_data = {"data": info}
-    return json.dumps(json_data)
+    return JsonResponse(json_data, status=400)
 
+def all_dream(request):
+    return get_all_db()
 
 def deduplication(txt):
     lines = re.split(r"([.。!！?？；;：:，,\s+])", txt)

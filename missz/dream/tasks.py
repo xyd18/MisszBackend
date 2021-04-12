@@ -48,7 +48,8 @@ def ask_for_interpret_competely(dream, body):
                     break
                 new_interpret = split_line[i]
             print(n, new_interpret)
-            if new_interpret == r"(\s+)" or new_interpret == "":
+            if new_interpret == r"(\s+)" or new_interpret == "" or new_interpret == " ":
+                print("no new interpret")
                 continue
             else:
                 interpret = new_interpret

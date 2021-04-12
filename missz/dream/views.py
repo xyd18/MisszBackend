@@ -28,11 +28,25 @@ def get_db(dream):
     dream_in_db = models.dreamEntry.objects.get(dream=dream)
     return dream_in_db.interpret
 
+
 def ask_db(dream):
     dreams_in_db = models.dreamEntry.objects.filter(dream=dream)
     if dreams_in_db.count() == 0:
         return False
     return True
+
+
+def get_all_db():
+    data_list = models.dreamEntry.objects.all()
+    info = []
+    for data in data_list:
+        dream = data.dream
+        interpret = data.interpret
+        meta_dict = {"dream": dream, "interpret": interpret}
+        info.append(meta_dict)
+    json_data = {"data": info}
+    return json.dumps(json_data)
+
 
 def deduplication(txt):
     lines = re.split(r"([.。!！?？；;：:，,\s+])", txt)

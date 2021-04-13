@@ -112,11 +112,6 @@ def interpret_dream(request):
     req = urllib.request.Request(url=URL_GPT, headers=headers, data=data)
 
     # 同时多次请求
-    # loop = asyncio.new_event_loop()
-    # asyncio.create_task(tasks.ask_for_interpret_competely(dream,body))
-    # loop.create_task(asking)
-    # loop.close()
-    # asyncio.run(tasks.ask_for_interpret_competely(dream,body))
     try:
         _thread.start_new_thread(tasks.ask_for_interpret_competely, (dream,body, ))
     except Exception as e:
@@ -124,14 +119,14 @@ def interpret_dream(request):
 
     try:
         resp = urllib.request.urlopen(req).read()
-        print("收到解梦\n")
+        print("主线程收到解梦\n")
         print(resp.decode('utf-8'))
     except Exception as e:
         logging.error(e)
         print(e)
     try:
-        res = json.loads(resp)
-        deduplication_txt = deduplication(res.get("result"))
+        res = json.loads(resp).get("result")
+        deduplication_txt = deduplication(res)
         interpret = deduplication_txt[deduplication_txt.find("这个梦的含义是") + 8:]
         insert_db(dream, interpret, "")
         # get_db(dream)

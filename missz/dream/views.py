@@ -77,6 +77,26 @@ def deduplication(txt):
         return_string += str
     return return_string
 
+def delBadSentence(txt):
+    lines = re.split(r"([.。!！?？；;：:，,\s+])", txt)
+    # for line in lines:
+    #     print(line+"\n")
+    # print("\n\n")
+    lines.append("")
+    lines = ["".join(i) for i in zip(lines[0::2], lines[1::2])]
+    # for line in lines:
+    #     print(line+"\n")
+    list_1 = []
+    for line in lines:
+        if len(line) <= 4:
+            continue
+        if line[-1] == ':' or line[-1] == '：':
+            continue
+        list_1.append(line)
+    return_string = ""
+    for str in list_1:
+        return_string += str
+    return return_string
 
 def interpret_dream(request):
     if request.method == 'POST':
@@ -128,6 +148,9 @@ def interpret_dream(request):
         res = json.loads(resp).get("result")
         deduplication_txt = deduplication(res)
         interpret = deduplication_txt[deduplication_txt.find("这个梦的含义是") + 8:]
+        interpret = delBadSentence(interpret)
+        if interpret == "":
+            return HttpResponse("此梦境前无古人后无来者，简直太厉害了。")
         insert_db(dream, interpret, "")
         # get_db(dream)
         return HttpResponse(interpret)

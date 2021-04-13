@@ -96,6 +96,8 @@ def delBadSentence(txt):
     return_string = ""
     for str in list_1:
         return_string += str
+        if return_string[-1] == '。' and len(return_string) >= 200:
+            return return_string
     return return_string
 
 def interpret_dream(request):

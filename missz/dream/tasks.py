@@ -50,7 +50,7 @@ def ask_for_interpret_competely(dream, body):
             print(n, new_interpret)
             if new_interpret == r"(\s+)" or new_interpret == "" or new_interpret == " ":
                 print("no new interpret")
-                continue
+                break
             else:
                 interpret = new_interpret
                 body["content"] += interpret
@@ -58,5 +58,7 @@ def ask_for_interpret_competely(dream, body):
             print("error happened!", e)
     deduplication_txt = views.deduplication(body["content"])
     interpret = deduplication_txt[deduplication_txt.find("这个梦的含义是") + 8:]
-    views.insert_db(dream, interpret, "")
-    print("insert: ",dream, interpret)
+    interpret = views.delBadSentence(interpret)
+    if not interpret == "":
+        views.insert_db(dream, interpret, "")
+        print("insert: ",dream, interpret)

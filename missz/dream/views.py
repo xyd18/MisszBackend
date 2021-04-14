@@ -77,6 +77,28 @@ def deduplication(txt):
         return_string += str
     return return_string
 
+def delBadSentence(txt):
+    lines = re.split(r"([.。!！?？；;：:，,\s+])", txt)
+    # for line in lines:
+    #     print(line+"\n")
+    # print("\n\n")
+    lines.append("")
+    lines = ["".join(i) for i in zip(lines[0::2], lines[1::2])]
+    # for line in lines:
+    #     print(line+"\n")
+    list_1 = []
+    for line in lines:
+        if len(line) <= 4:
+            continue
+        if line[-1] == ':' or line[-1] == '：':
+            continue
+        list_1.append(line)
+    return_string = ""
+    for str in list_1:
+        return_string += str
+        if return_string[-1] == '。' and len(return_string) >= 200:
+            return return_string
+    return return_string
 
 def interpret_dream(request):
     if request.method == 'POST':
@@ -112,11 +134,6 @@ def interpret_dream(request):
     req = urllib.request.Request(url=URL_GPT, headers=headers, data=data)
 
     # 同时多次请求
-    # loop = asyncio.new_event_loop()
-    # asyncio.create_task(tasks.ask_for_interpret_competely(dream,body))
-    # loop.create_task(asking)
-    # loop.close()
-    # asyncio.run(tasks.ask_for_interpret_competely(dream,body))
     try:
         _thread.start_new_thread(tasks.ask_for_interpret_competely, (dream,body, ))
     except Exception as e:
@@ -124,15 +141,18 @@ def interpret_dream(request):
 
     try:
         resp = urllib.request.urlopen(req).read()
-        print("收到解梦\n")
+        print("主线程收到解梦\n")
         print(resp.decode('utf-8'))
     except Exception as e:
         logging.error(e)
         print(e)
     try:
-        res = json.loads(resp)
-        deduplication_txt = deduplication(res.get("result"))
+        res = json.loads(resp).get("result")
+        deduplication_txt = deduplication(res)
         interpret = deduplication_txt[deduplication_txt.find("这个梦的含义是") + 8:]
+        interpret = delBadSentence(interpret)
+        if interpret == "":
+            return HttpResponse("此梦境前无古人后无来者，简直太厉害了。")
         insert_db(dream, interpret, "")
         # get_db(dream)
         return HttpResponse(interpret)

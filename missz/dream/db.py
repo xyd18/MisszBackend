@@ -27,7 +27,7 @@ def ask_db(dream):
 
 
 def get_all_db():
-    data_list = models.dreamEntry.objects.all()
+    data_list = models.dreamEntry.objects.all().order_by("good_num")
     info = []
     for data in data_list:
         dream = data.dream

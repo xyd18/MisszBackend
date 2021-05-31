@@ -132,7 +132,6 @@ def similar_dream(request):
         return_json = 'POST only!'
         return HttpResponse(return_json)
 
-
 def check_times(request):
     body = {
         "token": utils.TOKEN

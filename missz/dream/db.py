@@ -2,12 +2,12 @@ from . import models
 from django.http import JsonResponse
 
 
-def insert_db(dream, interpret, sent_embed):
+def insert_db(dream, interpret, sent_embed, good_num, bad_num):
     dreams_in_db = models.dreamEntry.objects.filter(dream=dream)
     if dreams_in_db.count() == 0:
-        models.dreamEntry.objects.create(dream=dream, interpret=interpret, sentence_embedding=sent_embed)
+        models.dreamEntry.objects.create(dream=dream, interpret=interpret, sentence_embedding=sent_embed, good_num=good_num, bad_num=bad_num)
     else:
-        dreams_in_db.update(interpret=interpret)
+        dreams_in_db.update(interpret=interpret, sentence_embedding=sent_embed, good_num=good_num, bad_num=bad_num)
 
 
 def delete_db(dream):
@@ -32,7 +32,9 @@ def get_all_db():
     for data in data_list:
         dream = data.dream
         interpret = data.interpret
-        meta_dict = {"dream": dream, "interpret": interpret}
+        good_num = data.good_num
+        bad_num = data.bad_num
+        meta_dict = {"dream": dream, "interpret": interpret, "good_num": good_num, "bad_num": bad_num}
         info.append(meta_dict)
     json_data = {"data": info}
     return JsonResponse(json_data, status=200)

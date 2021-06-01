@@ -74,7 +74,8 @@ def interpret_dream(request):
         return HttpResponse(return_json)
 
     if db.ask_db(dream):
-        return HttpResponse(db.get_db(dream))
+        interpret, _, _, _ = db.get_db(dream)
+        return HttpResponse(interpret)
 
     # content = "身份：军人。年龄：25岁。性别：女。梦境：" + dream + "周公解梦：这个梦的含义是，"
     content = dream + " 周公解梦：这个梦的含义是,"
@@ -148,3 +149,42 @@ def check_times(request):
         logging.error(e)
         print(e)
     return HttpResponse(resp)
+
+def get_good(request):
+    if request.method == 'POST':
+        try:
+            req = json.loads(request.body)
+            dream = req.get('dream')
+            if db.ask_db(dream):
+                interpret, embed, good, bad = db.get_db(dream)
+                good += 1
+                db.insert_db(dream, interpret, embed, good, bad)
+                return HttpResponse(good)
+            else:
+                return_json = 'dream not exist!'
+                return HttpResponse(return_json)
+        except Exception as e:
+            print(e)
+    else:
+        return_json = 'POST only!'
+        return HttpResponse(return_json)
+
+
+def get_bad(request):
+    if request.method == 'POST':
+        try:
+            req = json.loads(request.body)
+            dream = req.get('dream')
+            if db.ask_db(dream):
+                interpret, embed, good, bad = db.get_db(dream)
+                bad += 1
+                db.insert_db(dream, interpret, embed, good, bad)
+                return HttpResponse(bad)
+            else:
+                return_json = 'dream not exist!'
+                return HttpResponse(return_json)
+        except Exception as e:
+            print(e)
+    else:
+        return_json = 'POST only!'
+        return HttpResponse(return_json)

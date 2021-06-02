@@ -1,5 +1,5 @@
 # Create your views here.
-from django.http import HttpResponse
+from django.http import HttpResponse, JsonResponse
 
 from . import tasks, db, utils
 # import asyncio
@@ -92,10 +92,10 @@ def interpret_dream(request):
     req = urllib.request.Request(url=utils.URL_GPT, headers=headers, data=data)
 
     # 同时多次请求
-    try:
-        _thread.start_new_thread(tasks.ask_for_interpret_competely, (dream,body, ))
-    except Exception as e:
-        print("Error: unable to start thread", e)
+    # try:
+    #     _thread.start_new_thread(tasks.ask_for_interpret_competely, (dream,body, ))
+    # except Exception as e:
+    #     print("Error: unable to start thread", e)
 
     try:
         resp = urllib.request.urlopen(req).read()
@@ -111,7 +111,7 @@ def interpret_dream(request):
         interpret = delBadSentence(interpret)
         if interpret == "":
             return HttpResponse("此梦境前无古人后无来者，简直太厉害了。")
-        db.insert_db(dream, interpret, "")
+        db.insert_db(dream, interpret, utils.embed2str(utils.get_embedding(dream)), 0, 0)
         # get_db(dream)
         return HttpResponse(interpret)
     except Exception as e:
@@ -124,14 +124,15 @@ def similar_dream(request):
         try:
             req = json.loads(request.body)
             dream = req.get('dream')
-            # print("收到梦境 " + dream)
-        # return_json = json.dumps((name, job))
-        # return HttpResponse(return_json)
         except Exception as e:
             print(e)
     else:
         return_json = 'POST only!'
         return HttpResponse(return_json)
+    embedding = utils.get_embedding(dream)
+
+    json_data = {"data": utils.get_similar_dream(embedding)}
+    return JsonResponse(json_data, status=200)
 
 def check_times(request):
     body = {

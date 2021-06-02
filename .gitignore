@@ -3,4 +3,4 @@
 .DS_Store
 __pycache__/
 migrations/
-db.sqlite3
+missz/db.sqlite3

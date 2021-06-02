@@ -1,6 +1,6 @@
-.idea
-.vscode
+.idea/
+.vscode/
 .DS_Store
 __pycache__/
 migrations/
-missz/db.sqlite3
+db.sqlite3

@@ -2,16 +2,19 @@
 from django.http import HttpResponse, JsonResponse
 
 from . import tasks, db, utils
+from .gen_image import gen_image
 # import asyncio
-import _thread
+# import _thread
 
 import urllib.request
 import json
 import logging
 import re
 
+
 def all_dream(request):
     return db.get_all_db()
+
 
 def deduplication(txt):
     lines = re.split(r"([.。!！?？；;：:，,\s+])", txt)
@@ -33,6 +36,7 @@ def deduplication(txt):
     for str in list_1:
         return_string += str
     return return_string
+
 
 def delBadSentence(txt):
     lines = re.split(r"([.。!！?？；;：:，,\s+])", txt)
@@ -56,6 +60,7 @@ def delBadSentence(txt):
         if return_string[-1] == '。' and len(return_string) >= 200:
             return return_string
     return return_string
+
 
 def interpret_dream(request):
     if request.method == 'POST':
@@ -113,11 +118,12 @@ def interpret_dream(request):
             return HttpResponse("此梦境前无古人后无来者，简直太厉害了。")
         db.insert_db(dream, interpret, utils.embed2str(utils.get_embedding(dream)), 0, 0)
         # get_db(dream)
-        return HttpResponse(interpret)
+        return JsonResponse({'interpret': interpret})
     except Exception as e:
         logging.error(e)
         print("error happened!")
         return HttpResponse("error happened!")
+
 
 def similar_dream(request):
     if request.method == 'POST':
@@ -133,6 +139,7 @@ def similar_dream(request):
 
     json_data = {"data": utils.get_similar_dream(embedding)}
     return JsonResponse(json_data, status=200)
+
 
 def check_times(request):
     body = {
@@ -150,6 +157,7 @@ def check_times(request):
         logging.error(e)
         print(e)
     return HttpResponse(resp)
+
 
 def get_good(request):
     if request.method == 'POST':
@@ -181,6 +189,27 @@ def get_bad(request):
                 bad += 1
                 db.insert_db(dream, interpret, embed, good, bad)
                 return HttpResponse(bad)
+            else:
+                return_json = 'dream not exist!'
+                return HttpResponse(return_json)
+        except Exception as e:
+            print(e)
+    else:
+        return_json = 'POST only!'
+        return HttpResponse(return_json)
+
+
+def get_image(request):
+    if request.method == 'POST':
+        try:
+            req = json.loads(request.body)
+            dream = req.get('dream')
+            print(f'get dream {dream}')
+            if db.ask_db(dream):
+                interpret, embed_, good_, bad_ = db.get_db(dream)
+                code = hash(dream)
+                gen_image(code, dream, interpret)
+                return JsonResponse({'src': f'/backend/dream/media/{code}.png'})
             else:
                 return_json = 'dream not exist!'
                 return HttpResponse(return_json)

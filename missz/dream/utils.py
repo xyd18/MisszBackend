@@ -1,6 +1,8 @@
+import os
+
 from sentence_transformers import SentenceTransformer, util
-from dream.models import dreamEntry
-from dream.db import insert_db
+from .models import dreamEntry
+from .db import insert_db
 
 
 TOKEN = "c486e142f0ed6050f8d0497968079eb2"
@@ -10,22 +12,27 @@ URL_GPT = "http://lab.aminer.cn/isoa-2021/gpt"
 
 model = SentenceTransformer('paraphrase-TinyBERT-L6-v2')
 
+
 def str2list(string):
     strlist = string.split(",")
     embed = [float(i) for i in strlist]
     return embed
 
+
 def embed2str(embed):
     strlist = [str(num) for num in embed]
     return ",".join(strlist)
+
 
 def compute_all_embeddings():
     for d in dreamEntry.objects.all():
         embedding = model.encode(d.dream)
         insert_db(d.dream, d.interpret, embed2str(embedding), d.good_num, d.bad_num)
 
+
 def get_embedding(dream_str):
     return model.encode(dream_str)
+
 
 def get_similar_dream(dream_embedding):
 

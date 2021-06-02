@@ -1,4 +1,5 @@
-Django>=3.1.8
+Django~=2.2.5
 transformers==4.6.0
 torch==1.8.1
 sentence-transformers>=1.2.0
+Pillow~=7.0.0

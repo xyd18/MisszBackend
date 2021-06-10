@@ -79,8 +79,10 @@ def interpret_dream(request):
         return HttpResponse(return_json)
 
     if db.ask_db(dream):
+        # print("same dream")
         interpret, _, _, _ = db.get_db(dream)
-        return HttpResponse(interpret)
+        # print("return ", interpret)
+        return JsonResponse({'interpret': interpret})
 
     # content = "身份：军人。年龄：25岁。性别：女。梦境：" + dream + "周公解梦：这个梦的含义是，"
     content = dream + " 周公解梦：这个梦的含义是,"

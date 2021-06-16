@@ -78,6 +78,8 @@ def interpret_dream(request):
         print(return_json)
         return HttpResponse(return_json)
 
+    interpret = ""
+
     if db.ask_db(dream):
         # print("same dream")
         interpret, _, _, _ = db.get_db(dream)
@@ -85,36 +87,45 @@ def interpret_dream(request):
         return JsonResponse({'interpret': interpret})
 
     # content = "身份：军人。年龄：25岁。性别：女。梦境：" + dream + "周公解梦：这个梦的含义是，"
+    # 先qa
     content = dream + " 周公解梦：这个梦的含义是,"
     body = {
         "token": utils.TOKEN,
-        "app": "chat",
+        "app": "qa",
         "content": content
     }
     print("content:" + content)
-    # print("content len: "+len(content))
-    # print("content len: " + str(len(content)))
     data = bytes(json.dumps(body), 'utf8')
     headers = {"Content-Type": 'application/json'}
     req = urllib.request.Request(url=utils.URL_GPT, headers=headers, data=data)
-
-    # 同时多次请求
-    # try:
-    #     _thread.start_new_thread(tasks.ask_for_interpret_competely, (dream,body, ))
-    # except Exception as e:
-    #     print("Error: unable to start thread", e)
-
     try:
         resp = urllib.request.urlopen(req).read()
-        print("主线程收到解梦\n")
+        print("收到解梦\n")
         print(resp.decode('utf-8'))
     except Exception as e:
         logging.error(e)
         print(e)
     try:
-        res = json.loads(resp).get("result")
-        deduplication_txt = deduplication(res)
-        interpret = deduplication_txt[deduplication_txt.find("这个梦的含义是") + 8:]
+        res = json.loads(resp).get("result").get("content")
+        interpret += res
+        if interpret == "":
+            return HttpResponse("此梦境前无古人后无来者，简直太厉害了。")
+        if len(interpret) < 50:
+            if interpret[-1] in [".","。","!","！","?","？","；",";","：",":"]:
+                interpret = interpret[:len(interpret)-1] + ","
+            # chat again
+            body["content"] += interpret
+            body["app"] = "chat"
+            print("content:" + body["content"])
+            data = bytes(json.dumps(body), 'utf8')
+            headers = {"Content-Type": 'application/json'}
+            req = urllib.request.Request(url=utils.URL_GPT, headers=headers, data=data)
+            resp = urllib.request.urlopen(req).read()
+            print("收到解梦\n")
+            print(resp.decode('utf-8'))
+            res = json.loads(resp).get("result")
+            deduplication_txt = deduplication(res)
+            interpret = deduplication_txt[deduplication_txt.find("这个梦的含义是") + 8:]
         interpret = delBadSentence(interpret)
         if interpret == "":
             return HttpResponse("此梦境前无古人后无来者，简直太厉害了。")
@@ -125,6 +136,44 @@ def interpret_dream(request):
         logging.error(e)
         print("error happened!")
         return HttpResponse("error happened!")
+
+    # body = {
+    #     "token": utils.TOKEN,
+    #     "app": "chat",
+    #     "content": content
+    # }
+    # print("content:" + content)
+    # data = bytes(json.dumps(body), 'utf8')
+    # headers = {"Content-Type": 'application/json'}
+    # req = urllib.request.Request(url=utils.URL_GPT, headers=headers, data=data)
+
+    # 同时多次请求
+    # try:
+    #     _thread.start_new_thread(tasks.ask_for_interpret_competely, (dream,body, ))
+    # except Exception as e:
+    #     print("Error: unable to start thread", e)
+
+    # try:
+    #     resp = urllib.request.urlopen(req).read()
+    #     print("主线程收到解梦\n")
+    #     print(resp.decode('utf-8'))
+    # except Exception as e:
+    #     logging.error(e)
+    #     print(e)
+    # try:
+    #     res = json.loads(resp).get("result")
+    #     deduplication_txt = deduplication(res)
+    #     interpret = deduplication_txt[deduplication_txt.find("这个梦的含义是") + 8:]
+    #     interpret = delBadSentence(interpret)
+    #     if interpret == "":
+    #         return HttpResponse("此梦境前无古人后无来者，简直太厉害了。")
+    #     db.insert_db(dream, interpret, utils.embed2str(utils.get_embedding(dream)), 0, 0)
+    #     # get_db(dream)
+    #     return JsonResponse({'interpret': interpret})
+    # except Exception as e:
+    #     logging.error(e)
+    #     print("error happened!")
+    #     return HttpResponse("error happened!")
 
 
 def similar_dream(request):
